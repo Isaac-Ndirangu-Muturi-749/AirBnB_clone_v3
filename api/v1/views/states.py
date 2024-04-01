@@ -8,7 +8,6 @@ from models import storage
 from models.state import State
 
 
-
 @app_views.route('/states', methods=['GET', 'POST'], strict_slashes=False)
 def states_no_id():
     """
@@ -34,7 +33,9 @@ def states_no_id():
         return make_response(jsonify(new_object.to_dict()), 201)
 
 
-@app_views.route('/states/<state_id>', methods=['GET', 'DELETE', 'PUT'], strict_slashes=False)
+@app_views.route('/states/<state_id>',
+                 methods=['GET', 'DELETE', 'PUT'],
+                 strict_slashes=False)
 def states_with_id(state_id=None):
     """
         states route to handle http method for requested state by id
