@@ -5,6 +5,8 @@ Flask route that returns json status response
 from api.v1.views import app_views
 from flask import abort, jsonify, make_response, request
 from models import storage
+from models.state import State
+
 
 
 @app_views.route('/states', methods=['GET', 'POST'], strict_slashes=False)
