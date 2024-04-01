@@ -74,14 +74,19 @@ class FileStorage:
         """
             retrieves one object based on class name and id
         """
-        if cls and id:
-            key = "{}.{}".format(cls, id)
-            all_obj = self.all(cls)
-            return all_obj.get(key)
+        key = "{}.{}".format(cls, id)
+        if key in self.__objects.keys():
+            return self.__objects[key]
         return None
 
     def count(self, cls=None):
         """
         count of all objects in storage
         """
-        return (len(self.all(cls)))
+        if cls:
+            counter = 0
+            for obj in self.__objects.values():
+                if obj.__class__.__name__ == cls:
+                    counter += 1
+            return counter
+        return len(self.__objects)

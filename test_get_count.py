@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/home/ndirangu749/anaconda3/envs/alxse/bin/python
 """ Test .get() and .count() methods
 """
 from models import storage
