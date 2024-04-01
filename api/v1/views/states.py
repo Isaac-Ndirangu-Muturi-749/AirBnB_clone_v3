@@ -43,7 +43,7 @@ def states_with_id(state_id=None):
         abort(404, 'Not found')
 
     if request.method == 'GET':
-        return jsonify(state_obj.to_dict)
+        return jsonify(state_obj.to_dict())
 
     if request.method == 'DELETE':
         storage.delete(state_obj)
