@@ -5,6 +5,7 @@
 from api.v1.views import app_views
 from flask import abort, jsonify, request
 from models import storage
+from models.amenity import Amenity
 
 
 @app_views.route('/amenities/', methods=['GET', 'POST'])
@@ -13,8 +14,8 @@ def amenities_no_id(amenity_id=None):
         amenities route that handles http requests no ID given
     """
     if request.method == 'GET':
-        all_amenities = storage.all('Amenity')
-        all_amenities = [obj.to_json() for obj in all_amenities.values()]
+        all_amenities = storage.all('Amenity').values()
+        all_amenities = [obj.to_dict() for obj in all_amenities]
         return jsonify(all_amenities)
 
     if request.method == 'POST':
@@ -36,20 +37,26 @@ def amenities_with_id(amenity_id=None):
         amenities route that handles http requests with ID given
     """
     amenity_obj = storage.get('Amenity', amenity_id)
+
     if amenity_obj is None:
         abort(404, 'Not found')
 
     if request.method == 'GET':
-        return jsonify(amenity_obj.to_json())
+        return jsonify(amenity_obj.to_dict())
 
     if request.method == 'DELETE':
-        amenity_obj.delete()
-        del amenity_obj
-        return jsonify({}), 200
+        storage.delete(amenity_obj)
+        storage.save()
+        return make_response(jsonify({}), 200)
 
     if request.method == 'PUT':
         req_json = request.get_json()
         if req_json is None:
-            abort(400, 'Not a JSON')
-        amenity_obj.bm_update(req_json)
-        return jsonify(amenity_obj.to_json()), 200
+            abort(400, description='Not a JSON')
+
+        ignore = ['id', 'created_at', 'updated_at']
+        for key, value in req_json.items():
+            if key not in ignore:
+                setattr(amenity_obj, key, value)
+        storage.save()
+        return make_response(jsonify(amenity_obj.to_dict()), 200)

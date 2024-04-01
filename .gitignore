@@ -1,1 +1,2 @@
-__pycache__
+# Ignore Python cache files recursively
+__pycache__/**
