@@ -2,17 +2,14 @@
 """
 Flask App that integrates with AirBnB static HTML Template
 """
-from api.v1.views import app_views
-from flask import Flask, jsonify, make_response, render_template, url_for
 from flask_cors import CORS, cross_origin
+from api.v1.views import app_views
+from flask import Flask, jsonify, make_response, render_template
 from models import storage
 import os
 
 # Global Flask Application Variable: app
 app = Flask(__name__)
-
-# global strict slashes
-app.url_map.strict_slashes = False
 
 # app_views BluePrint defined in api.v1.views
 app.register_blueprint(app_views)
@@ -20,8 +17,12 @@ app.register_blueprint(app_views)
 # Cross-Origin Resource Sharing
 cors = CORS(app, resources={r'/api/v1/*': {'origins': '*'}})
 
+# global strict slashes
+app.url_map.strict_slashes = False
 
 # begin flask page rendering
+
+
 @app.teardown_appcontext
 def teardown_db(exception):
     """
@@ -41,7 +42,6 @@ def handle_404(exception):
     return make_response(jsonify(message), code)
 
 
-
 if __name__ == "__main__":
     """
     MAIN Flask App
@@ -51,4 +51,4 @@ if __name__ == "__main__":
     port = os.getenv('HBNB_API_PORT', 5000)
 
     # start Flask app
-    app.run(host=host, port=port)
+    app.run(host=host, port=port, threaded=True)
