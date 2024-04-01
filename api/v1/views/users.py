@@ -5,6 +5,8 @@
 from api.v1.views import app_views
 from flask import abort, jsonify, request
 from models import storage
+from models.user import User
+
 
 @app_views.route('/users/', methods=['GET', 'POST'])
 def users_no_id(user_id=None):
@@ -13,8 +15,8 @@ def users_no_id(user_id=None):
     """
 
     if request.method == 'GET':
-        all_users = storage.all('User')
-        all_users = [obj.to_json() for obj in all_users.values()]
+        all_users = storage.all('User').values()
+        all_users = [obj.to_dict() for obj in all_users]
         return jsonify(all_users)
 
     if request.method == 'POST':
@@ -38,11 +40,12 @@ def user_with_id(user_id=None):
         users route that handles http requests with ID given
     """
     user_obj = storage.get('User', user_id)
+
     if user_obj is None:
         abort(404, 'Not found')
 
     if request.method == 'GET':
-        return jsonify(user_obj.to_json())
+        return jsonify(user_obj.to_dict())
 
     if request.method == 'DELETE':
         user_obj.delete()
@@ -52,6 +55,11 @@ def user_with_id(user_id=None):
     if request.method == 'PUT':
         req_json = request.get_json()
         if req_json is None:
-            abort(400, 'Not a JSON')
-        user_obj.bm_update(req_json)
-        return jsonify(user_obj.to_json()), 200
+            abort(400, description='Not a JSON')
+
+        ignore = ['id', 'email', 'created_at', 'updated_at']
+        for key, value in req_json.items():
+            if key not in ignore:
+                setattr(user_obj, key, value)
+        storage.save()
+        return make_response(jsonify(user_obj.to_dict()), 200)
