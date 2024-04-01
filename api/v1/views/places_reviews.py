@@ -4,7 +4,7 @@ Flask route that returns json status response
 """
 from api.v1.views import app_views
 from flask import abort, jsonify, request
-from models import storage, CNC
+from models import storage
 
 
 @app_views.route('/places/<place_id>/reviews', methods=['GET', 'POST'])
@@ -36,11 +36,12 @@ def reviews_per_place(place_id=None):
             abort(404, 'Not found')
         if req_json.get('text') is None:
             abort(400, 'Missing text')
-        Review = CNC.get("Review")
+
         req_json['place_id'] = place_id
         new_object = Review(**req_json)
-        new_object.save()
-        return jsonify(new_object.to_json()), 201
+        storage.new(new_object)
+        storage.save()
+        return make_response(jsonify(new_object.to_dict()), 201)
 
 
 @app_views.route('/reviews/<review_id>', methods=['GET', 'DELETE', 'PUT'])

@@ -4,8 +4,7 @@
 """
 from api.v1.views import app_views
 from flask import abort, jsonify, request
-from models import storage, CNC
-
+from models import storage
 
 @app_views.route('/users/', methods=['GET', 'POST'])
 def users_no_id(user_id=None):
@@ -26,10 +25,11 @@ def users_no_id(user_id=None):
             abort(400, 'Missing email')
         if req_json.get('password') is None:
             abort(400, 'Missing password')
-        User = CNC.get('User')
+
         new_object = User(**req_json)
-        new_object.save()
-        return jsonify(new_object.to_json()), 201
+        storage.new(new_object)
+        storage.save()
+        return make_response(jsonify(new_object.to_dict()), 201)
 
 
 @app_views.route('/users/<user_id>', methods=['GET', 'DELETE', 'PUT'])

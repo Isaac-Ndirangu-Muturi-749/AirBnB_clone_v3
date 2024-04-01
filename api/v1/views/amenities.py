@@ -4,8 +4,7 @@
 """
 from api.v1.views import app_views
 from flask import abort, jsonify, request
-from models import storage, CNC
-from flasgger.utils import swag_from
+from models import storage
 
 
 @app_views.route('/amenities/', methods=['GET', 'POST'])
@@ -24,10 +23,11 @@ def amenities_no_id(amenity_id=None):
             abort(400, 'Not a JSON')
         if req_json.get('name') is None:
             abort(400, 'Missing name')
-        Amenity = CNC.get('Amenity')
+
         new_object = Amenity(**req_json)
-        new_object.save()
-        return jsonify(new_object.to_json()), 201
+        storage.new(new_object)
+        storage.save()
+        return make_response(jsonify(new_object.to_dict()), 201)
 
 
 @app_views.route('/amenities/<amenity_id>', methods=['GET', 'DELETE', 'PUT'])
