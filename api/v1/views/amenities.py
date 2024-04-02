@@ -8,7 +8,7 @@ from models import storage
 from models.amenity import Amenity
 
 
-@app_views.route('/amenities/', methods=['GET', 'POST'])
+@app_views.route('/amenities/', methods=['GET', 'POST'], strict_slashes=False)
 def amenities_no_id(amenity_id=None):
     """
         amenities route that handles http requests no ID given
@@ -19,9 +19,11 @@ def amenities_no_id(amenity_id=None):
         return jsonify(all_amenities)
 
     if request.method == 'POST':
-        req_json = request.get_json()
-        if req_json is None:
+        if request.headers.get('Content-Type') != 'application/json':
             abort(400, 'Not a JSON')
+
+        req_json = request.get_json()
+
         if req_json.get('name') is None:
             abort(400, 'Missing name')
 
@@ -31,7 +33,8 @@ def amenities_no_id(amenity_id=None):
         return make_response(jsonify(new_object.to_dict()), 201)
 
 
-@app_views.route('/amenities/<amenity_id>', methods=['GET', 'DELETE', 'PUT'])
+@app_views.route('/amenities/<amenity_id>',
+                 methods=['GET', 'DELETE', 'PUT'], strict_slashes=False)
 def amenities_with_id(amenity_id=None):
     """
         amenities route that handles http requests with ID given
@@ -50,9 +53,10 @@ def amenities_with_id(amenity_id=None):
         return make_response(jsonify({}), 200)
 
     if request.method == 'PUT':
+        if request.headers.get('Content-Type') != 'application/json':
+            abort(400, 'Not a JSON')
+
         req_json = request.get_json()
-        if req_json is None:
-            abort(400, description='Not a JSON')
 
         ignore = ['id', 'created_at', 'updated_at']
         for key, value in req_json.items():
