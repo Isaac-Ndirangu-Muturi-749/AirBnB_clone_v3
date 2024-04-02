@@ -25,7 +25,7 @@ def cities_per_state(state_id=None):
         return jsonify(state_cities)
 
     if request.method == 'POST':
-        if request.headers.get('Content-Type') != 'application/json':
+        if not request.is_json:
             abort(400, 'Not a JSON')
 
         req_json = request.get_json()
