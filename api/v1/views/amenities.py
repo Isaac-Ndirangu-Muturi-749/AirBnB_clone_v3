@@ -19,8 +19,8 @@ def amenities_no_id(amenity_id=None):
         return jsonify(all_amenities)
 
     if request.method == 'POST':
-        if request.headers.get('Content-Type') != 'application/json':
-            abort(400, 'Not a JSON')
+        if not request.get_json():
+            abort(400, description="Not a JSON")
 
         req_json = request.get_json()
 
@@ -53,8 +53,8 @@ def amenities_with_id(amenity_id=None):
         return make_response(jsonify({}), 200)
 
     if request.method == 'PUT':
-        if request.headers.get('Content-Type') != 'application/json':
-            abort(400, 'Not a JSON')
+        if not request.get_json():
+            abort(400, description="Not a JSON")
 
         req_json = request.get_json()
 
