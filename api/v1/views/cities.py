@@ -25,9 +25,11 @@ def cities_per_state(state_id=None):
         return jsonify(state_cities)
 
     if request.method == 'POST':
-        req_json = request.get_json()
-        if req_json is None:
+        if request.headers.get('Content-Type') != 'application/json':
             abort(400, 'Not a JSON')
+
+        req_json = request.get_json()
+
         if req_json.get("name") is None:
             abort(400, 'Missing name')
 
@@ -58,9 +60,10 @@ def cities_with_id(city_id=None):
         return make_response(jsonify({}), 200)
 
     if request.method == 'PUT':
+        if request.headers.get('Content-Type') != 'application/json':
+            abort(400, 'Not a JSON')
+
         req_json = request.get_json()
-        if req_json is None:
-            abort(400, description='Not a JSON')
 
         ignore = ['id', 'created_at', 'updated_at']
         for key, value in req_json.items():
