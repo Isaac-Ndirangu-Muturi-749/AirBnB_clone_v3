@@ -21,10 +21,10 @@ def states_no_id():
         return jsonify(list_states)
 
     if request.method == 'POST':
-        req_json = request.get_json()
-
         if request.headers.get('Content-Type') != 'application/json':
             abort(400, 'Not a JSON')
+
+        req_json = request.get_json()
 
         if req_json.get("name") is None:
             abort(400, 'Missing name')
@@ -56,10 +56,10 @@ def states_with_id(state_id=None):
         return make_response(jsonify({}), 200)
 
     if request.method == 'PUT':
-        req_json = request.get_json()
-
         if request.headers.get('Content-Type') != 'application/json':
             abort(400, 'Not a JSON')
+
+        req_json = request.get_json()
 
         ignore = ['id', 'created_at', 'updated_at']
         for key, value in req_json.items():
