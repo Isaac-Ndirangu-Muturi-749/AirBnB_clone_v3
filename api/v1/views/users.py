@@ -8,7 +8,7 @@ from models import storage
 from models.user import User
 
 
-@app_views.route('/users/', methods=['GET', 'POST'])
+@app_views.route('/users/', methods=['GET', 'POST'], strict_slashes=False)
 def users_no_id(user_id=None):
     """
         users route that handles http requests with no ID given
@@ -20,9 +20,11 @@ def users_no_id(user_id=None):
         return jsonify(all_users)
 
     if request.method == 'POST':
-        req_json = request.get_json()
-        if req_json is None:
+        if request.headers.get('Content-Type') != 'application/json':
             abort(400, 'Not a JSON')
+
+        req_json = request.get_json()
+
         if req_json.get('email') is None:
             abort(400, 'Missing email')
         if req_json.get('password') is None:
@@ -34,7 +36,8 @@ def users_no_id(user_id=None):
         return make_response(jsonify(new_object.to_dict()), 201)
 
 
-@app_views.route('/users/<user_id>', methods=['GET', 'DELETE', 'PUT'])
+@app_views.route('/users/<user_id>',
+                 methods=['GET', 'DELETE', 'PUT'], strict_slashes=False)
 def user_with_id(user_id=None):
     """
         users route that handles http requests with ID given
@@ -53,9 +56,10 @@ def user_with_id(user_id=None):
         return jsonify({}), 200
 
     if request.method == 'PUT':
+        if request.headers.get('Content-Type') != 'application/json':
+            abort(400, 'Not a JSON')
+
         req_json = request.get_json()
-        if req_json is None:
-            abort(400, description='Not a JSON')
 
         ignore = ['id', 'email', 'created_at', 'updated_at']
         for key, value in req_json.items():

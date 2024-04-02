@@ -8,7 +8,8 @@ from models import storage
 from models.review import Review
 
 
-@app_views.route('/places/<place_id>/reviews', methods=['GET', 'POST'])
+@app_views.route('/places/<place_id>/reviews',
+                 methods=['GET', 'POST'], strict_slashes=False)
 def reviews_per_place(place_id=None):
     """
         reviews route to handle http method for requested reviews by place
@@ -25,9 +26,11 @@ def reviews_per_place(place_id=None):
         return jsonify(place_reviews)
 
     if request.method == 'POST':
-        req_json = request.get_json()
-        if req_json is None:
+        if request.headers.get('Content-Type') != 'application/json':
             abort(400, 'Not a JSON')
+
+        req_json = request.get_json()
+
         user_id = req_json.get("user_id")
         if user_id is None:
             abort(400, 'Missing user_id')
@@ -47,7 +50,8 @@ def reviews_per_place(place_id=None):
         return make_response(jsonify(new_object.to_dict()), 201)
 
 
-@app_views.route('/reviews/<review_id>', methods=['GET', 'DELETE', 'PUT'])
+@app_views.route('/reviews/<review_id>',
+                 methods=['GET', 'DELETE', 'PUT'], strict_slashes=False)
 def reviews_with_id(review_id=None):
     """
         reviews route to handle http methods for given review by ID
@@ -66,9 +70,10 @@ def reviews_with_id(review_id=None):
         return make_response(jsonify({}), 200)
 
     if request.method == 'PUT':
+        if request.headers.get('Content-Type') != 'application/json':
+            abort(400, 'Not a JSON')
+
         req_json = request.get_json()
-        if req_json is None:
-            abort(400, description='Not a JSON')
 
         ignore = ['id', 'user_id', 'place_id', 'created_at', 'updated_at']
         for key, value in req_json.items():

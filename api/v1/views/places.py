@@ -12,7 +12,8 @@ from models.place import Place
 STORAGE_TYPE = environ.get('HBNB_TYPE_STORAGE')
 
 
-@app_views.route('/cities/<city_id>/places', methods=['GET', 'POST'])
+@app_views.route('/cities/<city_id>/places',
+                 methods=['GET', 'POST'], strict_slashes=False)
 def places_per_city(city_id=None):
     """
         places route to handle http method for requested places by city
@@ -29,10 +30,10 @@ def places_per_city(city_id=None):
         return jsonify(city_places)
 
     if request.method == 'POST':
-        req_json = request.get_json()
-
-        if req_json is None:
+        if request.headers.get('Content-Type') != 'application/json':
             abort(400, 'Not a JSON')
+
+        req_json = request.get_json()
 
         user_id = req_json.get("user_id")
         if user_id is None:
@@ -53,7 +54,8 @@ def places_per_city(city_id=None):
         return make_response(jsonify(new_object.to_dict()), 201)
 
 
-@app_views.route('/places/<place_id>', methods=['GET', 'DELETE', 'PUT'])
+@app_views.route('/places/<place_id>',
+                 methods=['GET', 'DELETE', 'PUT'], strict_slashes=False)
 def places_with_id(place_id=None):
     """
         places route to handle http methods for given place
@@ -72,9 +74,10 @@ def places_with_id(place_id=None):
         return make_response(jsonify({}), 200)
 
     if request.method == 'PUT':
+        if request.headers.get('Content-Type') != 'application/json':
+            abort(400, 'Not a JSON')
+
         req_json = request.get_json()
-        if req_json is None:
-            abort(400, description='Not a JSON')
 
         ignore = ['id', 'user_id', 'city_id', 'created_at', 'updated_at']
         for key, value in req_json.items():

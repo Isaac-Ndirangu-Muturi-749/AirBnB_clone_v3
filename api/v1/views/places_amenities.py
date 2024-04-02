@@ -29,7 +29,7 @@ def amenities_per_place(place_id=None):
                 response.append(storage.get('Amenity', amen))
         place_amenities = [
             obj.to_json() for obj in place_amenities
-            ]
+        ]
         return jsonify(place_amenities)
 
 
